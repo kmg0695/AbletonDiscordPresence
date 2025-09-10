@@ -10,7 +10,7 @@ class AbletonDiscordPresence(ControlSurface):
 
     def __init__(self, c_instance):
         ControlSurface.__init__(self, c_instance)
-        self.rpc = RPC(1414970197466681509)
+        self.rpc = RPC(1414970197466681509, output=False, exit_if_discord_close=False, exit_on_disconnect=False)
         self.started_t = int(time())
         self.timer = None
         self.update_rpc()
