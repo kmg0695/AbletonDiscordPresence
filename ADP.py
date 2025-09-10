@@ -4,9 +4,6 @@ import threading
 from time import time
 from .drpc.discordrpc import RPC
 
-FOLDER = '/AbletonDiscordPresence/'
-SCRIPT_NAME = 'AbletonDiscordPresence'
-
 class AbletonDiscordPresence(ControlSurface):
     __module__ = __name__
     __doc__ = "Ableton Discord Presence"
@@ -15,13 +12,13 @@ class AbletonDiscordPresence(ControlSurface):
         ControlSurface.__init__(self, c_instance)
         self.rpc = RPC(1414970197466681509)
         self.started_t = int(time())
-        # self.show_message(SCRIPT_NAME)
         self.timer = None
         self.update_rpc()
 
 
     def disconnect(self):
         if self.timer: self.timer.cancel()
+        self.rpc.disconnect()
         ControlSurface.disconnect(self)
 
     def update_rpc(self):
@@ -71,24 +68,24 @@ class AbletonDiscordPresence(ControlSurface):
             else:
                 details += "Editing an audio clip"
         else:
-            prefix = ""
             if t.has_midi_input:
-                prefix = "On a "
                 details += "MIDI Track"
             if t.has_audio_input:
                 if t == song.master_track:
-                    prefix = "On the "
                     details += "Master Track"
                 else:
-                    prefix = "On an "
                     details += "Audio Track"
-            if d and hasattr(d, "name"):
-                details += f" (tweaking {d.name})"
-            else:
-                details = prefix + details
-            fx = len(t.devices)
-            if fx > 0:
-                details += f" w/ {fx} devices"
+        if t.has_midi_input:
+            # figure out which synth it is
+            synths = [d.name for d in t.devices if d.type == Live.Device.DeviceType.instrument]
+            if len(synths) > 0:
+                s = synths[0]
+                details += f" [{s}]"
+        if d and hasattr(d, "name"):
+            details += f" (tweaking {d.name})"
+        fx = len(t.devices)
+        if fx > 0:
+            details += f" w/ {fx} devices"
         
 
         self.rpc.set_activity(
