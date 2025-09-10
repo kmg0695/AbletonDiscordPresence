@@ -1,0 +1,3 @@
+[submodule "drpc"]
+	path = drpc
+	url = https://github.com/Senophyx/Discord-RPC/
